@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'
 import express, { Application } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
@@ -9,10 +10,11 @@ class App {
     //declaring our controller
     public Controller: Controller;
     public app: Application;
-    
+
     constructor() {
         this.app = express();
         this.setConfig();
+        // this.setupDb();
 
         //Creating and assigning a new instance of our controller
         this.Controller = new Controller(this.app);
@@ -23,6 +25,13 @@ class App {
         this.app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
         this.app.use(cors());
     }
+
+    private setupDb(): void {
+        var mongoDb = "mongodb://127.0.0.1/twitter_sentiment_analysis";
+        mongoose.connect(mongoDb);
+        var db = mongoose.connection;
+        db.on("error", console.error.bind(console, "MongoDB Connection error"));
+      }
 }
 
 export default new App().app;
