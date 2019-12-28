@@ -1,9 +1,14 @@
 {
-    "defaultSeverity": "error",
-    "extends": ["tslint:recommended"],
-    "jsRules": {},
-    "rules": {
-	    "no-console": false
+  "extends": "tslint:recommended",
+  "rules": {
+    "max-line-length": {
+      "options": [100]
     },
-    "rulesDirectory": []
+    "member-ordering": false,
+    "no-consecutive-blank-lines": false,
+    "object-literal-sort-keys": false,
+    "ordered-imports": false,
+    "quotemark": [true, "single"],
+    "variable-name": [true, "allow-leading-underscore"]
+  }
 }
