@@ -12,7 +12,7 @@ const ListItem = ({ text, score }) => {
     <span className="badge badge-primary badge-pill">{ score } </span>
     </li>
   )
-}
+};
 
 const Loader = () => {
   return (
@@ -117,6 +117,7 @@ class TwitterSearchPage extends Component {
       {
         isLoading && <Loader />
       }
+      { !!this.state.twitts.length && !isLoading && <Average average={this.state.average} /> }
       { !isLoading && <ul className='list-group' style={{ marginTop: '20px' }}>
         {
           this.state.twitts.map(({ text, score }, index) => {
@@ -127,7 +128,6 @@ class TwitterSearchPage extends Component {
         }
       </ul>
       }
-    { !!this.state.twitts.length && !isLoading && <Average average={this.state.average} /> }
     </div>
   )
   }

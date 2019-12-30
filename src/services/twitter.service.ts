@@ -6,7 +6,7 @@ export class TwitterSentimentService {
 
   public async tweetSentimentAnalysis(searchTerm: string) {
     const searchResult = await clientTwitter.get(
-        'search/tweets', {q: searchTerm, count: 10, language: 'en'},
+        'search/tweets', {q: searchTerm, count: 50, language: 'en'},
     );
 
     const tweetSentimentResults: {
@@ -36,9 +36,17 @@ export class TwitterSentimentService {
             }
           });
 
-          tweetSentimentResults.results = results.filter( (item) => {
-             return !(item.sentimentScore instanceof Error);
-          });
+          tweetSentimentResults.results = results
+              .filter( (item) => {
+                  return !(item.sentimentScore instanceof Error);
+              }).sort( (x, y) =>{
+                  if ( x.sentimentScore < y.sentimentScore) {
+                      return 1;
+                  } else if (x.sentimentScore > y.sentimentScore) {
+                      return -1;
+                  }
+                  return 0;
+              });
 
           tweetSentimentResults.sentimentAverage = tweetSentimentResults.results
               .reduce((acc, val) => {
