@@ -21,7 +21,7 @@ class App {
 
     private setConfig() {
         this.app.use(bodyParser.json({ limit: '50mb' }));
-        this.app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+        this.app.use(bodyParser.urlencoded({ extended: true }));
         this.app.use(cors());
     }
     // If DB init is needed

@@ -1,5 +1,7 @@
-import { Application } from 'express';
-import { TwitterSentimentService } from './services/twitter.service';
+import {Application} from 'express';
+import {TwitterSentimentService} from './services/twitter.service';
+
+import asyncHandler from 'express-async-handler';
 
 export class Controller {
     private twitterSearchService: TwitterSentimentService;
@@ -10,10 +12,15 @@ export class Controller {
     }
 
     public routes() {
-        this.app.route('/twitter_sentiment').get(
-            async (req, res) => {
-                res.status(200)
-                    .send(await this.twitterSearchService.tweetSentimentAnalysis(req.query.q));
-        });
+        this.app.get('/twitter_sentiment',
+            asyncHandler(async (req, res, next) => {
+                await this.twitterSearchService.tweetSentimentAnalysis(req.query.q)
+                    .then((result) => {
+                        res.status(200).json(result);
+                    })
+                    .catch((error) => {
+                        res.status(500).send(error);
+                    });
+        }));
     }
 }
