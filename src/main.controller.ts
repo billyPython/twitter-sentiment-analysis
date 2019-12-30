@@ -1,4 +1,4 @@
-import {Application} from 'express';
+import express, {Application} from 'express';
 import {TwitterSentimentService} from './services/twitter.service';
 
 import asyncHandler from 'express-async-handler';
@@ -12,6 +12,7 @@ export class Controller {
     }
 
     public routes() {
+        this.app.use('/', express.static('public'));
         this.app.get('/twitter_sentiment',
             asyncHandler(async (req, res, next) => {
                 await this.twitterSearchService.tweetSentimentAnalysis(req.query.q)
