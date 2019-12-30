@@ -10,29 +10,43 @@ export class TwitterSentimentService {
     );
 
     const tweetSentimentResults: {
-      sentimentAverage: number, result: Array<{ tweet: string, sentimentScore: number }>,
-    } = {sentimentAverage: 0, result: []};
+      sentimentAverage: number, results: Array<{ tweet: string, sentimentScore: number }>,
+    } = {sentimentAverage: 0, results: []};
 
     const promises = searchResult.statuses.map( (tweet) => {
         return clientGNLP.analyzeSentiment(
-          {document: {content: tweet.text, type: 'PLAIN_TEXT'}});
+          {document: {content: tweet.text, type: 'PLAIN_TEXT'}}).catch( (err) => {
+            return err;
+        });
     });
 
-    let sentimentResult: any;
-    sentimentResult = await Promise.all(promises).catch( (err) => {
-      console.log(err);
-    });
+    await Promise.all(promises)
+        .then( (values: any) => {
+          const results = searchResult.statuses.map((item, index) => {
+            if ( !(values[index] instanceof Error) ) {
+              return {
+                tweet: item.text,
+                sentimentScore: values[index][0].documentSentiment.score,
+              };
+            } else {
+                return {
+                    tweet: item.text,
+                    sentimentScore: values[index],
+                };
+            }
+          });
 
-    tweetSentimentResults.result = searchResult.statuses.map((item, index) => {
-      return {
-        tweet: item.text,
-        sentimentScore: sentimentResult[index][0].documentSentiment.score,
-      };
-    });
+          tweetSentimentResults.results = results.filter( (item) => {
+             return !(item.sentimentScore instanceof Error);
+          });
 
-    tweetSentimentResults.sentimentAverage = tweetSentimentResults.result
-        .reduce((acc, val) => {
-          return acc + val.sentimentScore; }, 0);
+          tweetSentimentResults.sentimentAverage = tweetSentimentResults.results
+              .reduce((acc, val) => {
+                return acc + val.sentimentScore; }, 0);
+        })
+        .catch( (err) => {
+          console.log(err);
+        });
 
     return tweetSentimentResults;
 
