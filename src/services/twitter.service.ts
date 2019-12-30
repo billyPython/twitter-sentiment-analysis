@@ -13,19 +13,22 @@ export class TwitterSentimentService {
       sentimentAverage: number, result: Array<{ tweet: string, sentimentScore: number }>,
     } = {sentimentAverage: 0, result: []};
 
-    for (const item of searchResult.statuses) {
-      try {
-        let [result] = await clientGNLP.analyzeSentiment(
-            {document: {content: item.text, type: 'PLAIN_TEXT'}},
-        );
-        tweetSentimentResults.result.push({
-          tweet: item.text,
-          sentimentScore: result.documentSentiment.score,
-        });
-      } catch (e) {
-        console.log(e);
-      }
-    }
+    const promises = searchResult.statuses.map( (tweet) => {
+        return clientGNLP.analyzeSentiment(
+          {document: {content: tweet.text, type: 'PLAIN_TEXT'}});
+    });
+
+    let sentimentResult: any;
+    sentimentResult = await Promise.all(promises).catch( (err) => {
+      console.log(err);
+    });
+
+    tweetSentimentResults.result = searchResult.statuses.map((item, index) => {
+      return {
+        tweet: item.text,
+        sentimentScore: sentimentResult[index][0].documentSentiment.score,
+      };
+    });
 
     tweetSentimentResults.sentimentAverage = tweetSentimentResults.result
         .reduce((acc, val) => {
