@@ -15,13 +15,17 @@ export class Controller {
         this.app.use('/', express.static('public'));
         this.app.get('/twitter_sentiment',
             asyncHandler(async (req, res, next) => {
-                await this.twitterSearchService.tweetSentimentAnalysis(req.query.q)
-                    .then((result) => {
-                        res.status(200).json(result);
-                    })
-                    .catch((error) => {
-                        res.status(500).send(error);
-                    });
+                if (req.query.q === '' || req.query.q === null) {
+                    res.status(400).send('Query parameter `q` is missing!');
+                } else {
+                    await this.twitterSearchService.tweetSentimentAnalysis(req.query.q)
+                        .then((result) => {
+                            res.status(200).json(result);
+                        })
+                        .catch((error) => {
+                            res.status(500).send(error);
+                        });
+                }
         }));
     }
 }
